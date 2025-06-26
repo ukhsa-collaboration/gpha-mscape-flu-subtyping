@@ -24,6 +24,11 @@ NextFlow Command
 nextflow run main.nf -profile docker --samplesheet sample-sheet.csv --outdir mapping-test
 ```
 
+Outputs:
+1. Quarto report per sample
+2. Table of per segment summary results
+3. Analysis json for ingest into the analysis table
+   
 ## To Do 
 1. Tidy up config files to ensure parameters are tidy & consistent
 2. Quarto report - add sample meta-data/ Qc section to report
