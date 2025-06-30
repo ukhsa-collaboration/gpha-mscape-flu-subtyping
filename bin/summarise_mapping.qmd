@@ -16,6 +16,7 @@ date: last-modified
 
 climb_id= 'TEST_ID'
 datapath= './flusub.mapped.tab'
+
 ```
 
 Results of mapping to the INSAFLU Reference Set for `{python} climb_id`
@@ -31,7 +32,6 @@ This product is **OFF-SEN** and should not be shared wider than its distribution
 #| tags: [parameters]
 #| 
 from collections import Counter
-import pandas as pd
 import os,sys,glob
 import warnings
 warnings.filterwarnings("ignore")
@@ -123,7 +123,7 @@ na = segreadstab[segreadstab['Segment']=='NA']
 mixed_results_HA = False
 mixed_results_NA = False
 
-ha_seasonal = ['1','3',1,3]
+ha_seasonal = ['1','3',1,3,'B/Vic']
 ha_seasonal_flag = False
 if ha.Num_reads[0] ==0:
     HAtype = 'H-'
@@ -140,13 +140,17 @@ else:
         HAtype=f'H{subtypes[0]}'
         if subtypes[0] in ha_seasonal:
             ha_seasonal_flag = True
+        if HAtype == 'HB/Vic':
+            HAtype = "InfB: HA-B/Vic"
+        if "pdm09" in HAtype:
+            HAtype = HAtype.replace("pdm09","")
 if ha.Num_reads[0] <=2:
     HAconfidence = 'Low'
 elif ha.Num_reads[0] <=5:
     HAconfidence = 'Medium'
 else:
     HAconfidence = 'High'
-na_seasonal = ['1','2',1,2]
+na_seasonal = ['1','2',1,2,'B/Vic']
 na_seasonal_flag = False
 NAtype = '-'
 if na.Num_reads[0] ==0:
@@ -162,6 +166,10 @@ else:
         NAtype=f'N{nasubtypes[0]}'
         if nasubtypes[0] in na_seasonal:
             na_seasonal_flag = True
+        if NAtype == 'NB/Vic':
+            NAtype = "InfB: NA-B/Vic"
+        if "pdm09" in NAtype:
+            NAtype = NAtype.replace("pdm09","")
 if na.Num_reads[0] <=2:
     NAconfidence = 'Low'
 elif na.Num_reads[0] <=5:
@@ -249,6 +257,7 @@ json_object = json.dumps(generate_status_json())
 with open(f"{climb_id}_flusub_result.json", "w") as outfile:
     outfile.write(json_object)
 ```
+## Sample Meta-data
 
 
 ## Summary Result
