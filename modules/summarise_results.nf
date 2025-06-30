@@ -4,7 +4,7 @@ nextflow.enable.dsl=2
 
 process RUN_QUARTO{
     tag "${climb_id}"
-    container 'community.wave.seqera.io/library/pandas_pip_jupyter-cache_papermill_quarto-cli:249efa263d90d5cf'
+    container 'community.wave.seqera.io/library/pandas_pip_jupyter-cache_onyx-client_pruned:9b8ef66786a23f5b'
     publishDir "${params.outdir}/${climb_id}", mode: 'copy'
     
     input:
@@ -27,8 +27,9 @@ process RUN_QUARTO{
     cp $PWD/bin/summarise_mapping.qmd .
     cp $PWD/bin/_quarto.yml .
     cp -r $PWD/bin/_extensions .
-
-    quarto render summarise_mapping.qmd --output '${climb_id}_summarise_mapping.html' -P climb_id:'${climb_id}' -P datapath:'flusub.mapped.tab' 
+    
+    
+    quarto render summarise_mapping.qmd --output '${climb_id}_summarise_mapping.html' -P climb_id:'${climb_id}' -P datapath:'flusub.mapped.tab' -P metadata:'../metadata.csv'
     
     """
 }
