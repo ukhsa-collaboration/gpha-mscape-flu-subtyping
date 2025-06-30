@@ -6,10 +6,11 @@ def helpMessage() {
   log.info """
         Usage:
         The typical command for running the pipeline is as follows:
-        nextflow run main.nf --query Climb_ID --outdir "output_directory"
+        nextflow run main.nf --samplesheet sample-sheet.csv --metadata metadata.csv --outdir "output_directory"
 
         Mandatory arguments:
          --samplesheet                        ClimbID to be subtyped
+         --metadata                        Metadata for ClimbIDs
          --outdir                       Output directory to place final tables
 
        Optional arguments:
@@ -26,6 +27,10 @@ if (params.help) {
 
 if (!params.samplesheet) {
     error "Please provide a samplesheet with --samplesheet"
+}
+
+if (!params.metadata) {
+    error "Please provide the metadata with --metadata"
 }
 
 // Define a channel from the sample sheet
@@ -49,9 +54,11 @@ samples = Channel
 workflow {
     // handle input parameters
     log.info "Samplesheet: ${params.samplesheet}"
+    log.info "Metadata table: ${params.metadata}"
     log.info "Output directory: ${params.output}"
     log.info "Number of CPUs (Max): ${params.max_cpus}"
-
+    
+        
     // Run subworkflows
     FLUSUB_ANALYSIS(ch_fastqs.single_end)
 }
