@@ -11,11 +11,12 @@ process RUN_MINIMAP{
     tuple val(climb_id), path(fastq1)
 
     output:
-    tuple  val(climb_id), path(fastq1), path('flusub.mapped.tab'), emit: mappedreads
+    tuple  val(climb_id), path('flusub.mapped.tab'), emit: mappedreads
     
     
     script:
     """
     minimap2 --secondary=no /shared/team/influenza-testing/nflow-test/bin/insaflu_refset_2025.fasta ${fastq1} > 'flusub.mapped.tab'
+    rm *gz
     """
 }

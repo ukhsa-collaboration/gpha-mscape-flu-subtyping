@@ -8,7 +8,7 @@ process RUN_QUARTO{
     publishDir "${params.outdir}/${climb_id}", mode: 'copy'
     
     input:
-    tuple val(climb_id), path(fastq1), path(mappedreads)
+    tuple val(climb_id), path(mappedreads)
 
     output:
     tuple  val(climb_id),
@@ -27,9 +27,9 @@ process RUN_QUARTO{
     cp $PWD/bin/summarise_mapping.qmd .
     cp $PWD/bin/_quarto.yml .
     cp -r $PWD/bin/_extensions .
+
     
-    
-    quarto render summarise_mapping.qmd --output '${climb_id}_summarise_mapping.html' -P climb_id:'${climb_id}' -P datapath:'flusub.mapped.tab' -P metadata:'../metadata.csv'
+    quarto render summarise_mapping.qmd --output '${climb_id}_summarise_mapping.html' -P climb_id:'${climb_id}' -P datapath:'flusub.mapped.tab' -P metadata:'$PWD/${params.outdir}/metadata.csv'
     
     """
 }

@@ -71,6 +71,7 @@ def get_record_by_climb_id(climb_id_list: list):
 
 
 def get_species_proportion(record_id, species):
+
     try:
         with OnyxClient(config) as client:
             record = client.get(
@@ -137,15 +138,18 @@ def write_to_csv(dict_list: list, output: Path):
         writer = csv.DictWriter(file, fieldnames=fieldnames)
         writer.writeheader()
         writer.writerows(dict_list)
-
+        
 def main():
     filename1 = datetime.datetime.now().strftime("%Y%m%d-%H%M%S")
     args = get_args()
     climb_id_list = parse_file(args.input)
+    climb_id_list = list(filter(None, climb_id_list))
+
     dict_list = get_record_by_climb_id(climb_id_list)
     write_to_csv(dict_list, os.path.join(args.output,f"{filename1}-sample-sheet-nf.csv"))
     metadata = get_metadata_by_climb_id(climb_id_list)
     md = pd.DataFrame.from_dict(metadata)
+    print(md.shape)
     for record in climb_id_list:
         try:
             df_info = []
