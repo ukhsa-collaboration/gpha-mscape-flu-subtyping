@@ -55,10 +55,10 @@ workflow {
     // handle input parameters
     log.info "Samplesheet: ${params.samplesheet}"
     log.info "Metadata table: ${params.metadata}"
-    log.info "Output directory: ${params.output}"
+    log.info "Output directory: ${params.outdir}"
     log.info "Number of CPUs (Max): ${params.max_cpus}"
     
         
     // Run subworkflows
-    FLUSUB_ANALYSIS(ch_fastqs.single_end)
+    FLUSUB_ANALYSIS(params.metadata,ch_fastqs.single_end)
 }

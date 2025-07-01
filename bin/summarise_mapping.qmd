@@ -16,7 +16,7 @@ date: last-modified
 
 climb_id= 'TEST_ID'
 datapath= './flusub.mapped.tab'
-
+metadata = './metadata.csv'
 ```
 
 Results of mapping to the INSAFLU Reference Set for `{python} climb_id`
@@ -34,6 +34,7 @@ This product is **OFF-SEN** and should not be shared wider than its distribution
 from collections import Counter
 import os,sys,glob
 import warnings
+import pandas as pd
 warnings.filterwarnings("ignore")
 cols = ['query_name','query_len','query_start_coord','query_end_coord','strand','target_name','target_length','target_start','target_end','num_base_mapped','num_bases_gaps_mapped','mapping_quality','x1','x2','x3','x4','x5','x6']
 
@@ -259,6 +260,23 @@ with open(f"{climb_id}_flusub_result.json", "w") as outfile:
 ```
 ## Sample Meta-data
 
+
+```{python}
+#| tags: [metadata]
+#| label: tbl-metadata
+#| tbl-cap: "Sample Meta-data"
+#| layout-ncol: 3
+import pandas as pd
+from IPython.display import Markdown, display
+
+metatab =pd.read_csv(metadata)
+metatab_filt = metatab[metatab['climb_id']==climb_id]
+metatab_filt = metatab_filt.T
+metatab_filt.columns = ['']
+
+display(Markdown(metatab_filt.to_markdown(index = True)))
+
+```
 
 ## Summary Result
 
