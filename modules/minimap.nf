@@ -16,7 +16,7 @@ process RUN_MINIMAP{
     
     script:
     """
-    minimap2 --secondary=no /shared/team/influenza-testing/nflow-test/bin/insaflu_refset_2025.fasta ${fastq1} > 'flusub.mapped.tab'
+    minimap2 --secondary=no $PWD/bin/insaflu_refset_2025.fasta ${fastq1} > 'flusub.mapped.tab'
     rm *gz
     """
 }
