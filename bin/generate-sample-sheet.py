@@ -25,6 +25,7 @@ def get_args() -> argparse.Namespace:
     parser.add_argument("-o", "--output",
                 help="Output directory for downloaded data",
                 required=True, type=Path)
+    parser.add_argument("-p","--project",help="mscape / synthscape")
     args = parser.parse_args()
     return args
 
@@ -45,7 +46,7 @@ def get_record_by_climb_id(climb_id_list: list):
         try:
             with OnyxClient(config) as client:
                     data = pd.DataFrame(client.filter(
-                    project = "mscape",
+                    project = args.project,
                     climb_id = id
                 ))
         
