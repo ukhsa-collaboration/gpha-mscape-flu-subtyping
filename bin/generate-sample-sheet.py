@@ -26,6 +26,7 @@ def get_args() -> argparse.Namespace:
     parser.add_argument("-o", "--output",
                 help="Output directory for downloaded data",
                 required=True, type=Path)
+    parser.add_argument("-p","--project",help="project domain",required=True)
     args = parser.parse_args()
     return args
 
@@ -46,7 +47,7 @@ def get_record_by_climb_id(climb_id_list: list):
         try:
             with OnyxClient(config) as client:
                     data = pd.DataFrame(client.filter(
-                    project = "mscape",
+                    project = project,
                     climb_id = id
                 ))
         
@@ -63,7 +64,7 @@ def get_record_by_climb_id(climb_id_list: list):
                 'kraken_report': os.path.join(
                 taxon_reports_dir, 
                 str(id)+str('_PlusPF.kraken_report.json'))
-        })
+            })
         except KeyError:
             print(f"Sample {id} not found in database. Skipping.")
             pass
@@ -75,12 +76,18 @@ def get_species_proportion(record_id, species):
     try:
         with OnyxClient(config) as client:
             record = client.get(
-                project = "mscape",
+                project =project,
                 climb_id = record_id)
 
         class_calls = pd.DataFrame(record['classifier_calls'])
-        unclass = class_calls.loc[class_calls['human_readable'] == 'unclassified', 'count_descendants'].item()
-        root = class_calls.loc[class_calls['human_readable'] == 'root', 'count_descendants'].item()
+        try:    
+            unclass = class_calls.loc[class_calls['human_readable'] == 'unclassified', 'count_descendants'].item()
+        except:
+            unclass = 0
+        try:
+            root = class_calls.loc[class_calls['human_readable'] == 'root', 'count_descendants'].item()
+        except:
+            root = 0
         total_reads = unclass + root
         df_dict = {}
         for s in species:
@@ -104,7 +111,7 @@ def get_metadata_by_climb_id(climb_id_list: list):
         try:
             with OnyxClient(config) as client:
                     data = pd.DataFrame(client.filter(
-                    project = "mscape",
+                    project = project,
                     climb_id = id
                 ))
         
@@ -119,7 +126,7 @@ def get_metadata_by_climb_id(climb_id_list: list):
                 'kraken_report': os.path.join(
                 taxon_reports_dir, 
                 str(id)+str('_PlusPF.kraken_report.json'))
-        })
+            })
         except KeyError:
             print(f"Sample {id} not found in database. Skipping.")
             pass
@@ -145,12 +152,15 @@ def main():
     climb_id_list = parse_file(args.input)
     climb_id_list = list(filter(None, climb_id_list))
 
+    global project
+    project = args.project
     dict_list = get_record_by_climb_id(climb_id_list)
     write_to_csv(dict_list, os.path.join(args.output,f"{filename1}-sample-sheet-nf.csv"))
     metadata = get_metadata_by_climb_id(climb_id_list)
     md = pd.DataFrame.from_dict(metadata)
     print(md.shape)
     for record in climb_id_list:
+        print(record)
         try:
             df_info = []
             df_dict = get_species_proportion(record, ["Alphainfluenzavirus","Betainfluenzavirus"])
