@@ -26,7 +26,9 @@ def get_args() -> argparse.Namespace:
     parser.add_argument("-o", "--output",
                 help="Output directory for downloaded data",
                 required=True, type=Path)
+
     parser.add_argument("-p","--project",help="project domain",required=True)
+
     args = parser.parse_args()
     return args
 
