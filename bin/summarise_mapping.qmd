@@ -131,18 +131,19 @@ if ha.Num_reads[0] ==0:
 else:
     hanewdf = newdf[newdf['target_segment']=='HA']
     subtypes = list(set(hanewdf['hit_Htype']))
-
+    subtypes = list(filter(lambda x: x is not None, subtypes)) 
     if len(subtypes)>1:
         #choose subtype
         multsubtypes = ";".join(subtypes)
         HAtype=f'H{multsubtypes}'
         mixed_results_HA = True
+        
     else:
         HAtype=f'H{subtypes[0]}'
         if subtypes[0] in ha_seasonal:
             ha_seasonal_flag = True
         if HAtype == 'HB/Vic':
-            HAtype = "InfB: HA-B/Vic"
+            HAtype = "InfB: HA-B/Vic "
         if "pdm09" in HAtype:
             HAtype = HAtype.replace("pdm09","")
 if ha.Num_reads[0] <=2:
@@ -159,18 +160,22 @@ if na.Num_reads[0] ==0:
 else:
     nanewdf = newdf[newdf['target_segment']=='NA']
     nasubtypes = list(set(nanewdf['hit_Ntype']))
+    nasubtypes = list(filter(lambda x: x is not None, nasubtypes)) 
     if len(nasubtypes)>1:
        #choose subtype
         mixed_results_NA = True
+        
         nasubtypes = ";".join(nasubtypes)
-    else:
+    elif nasubtypes==1:
         NAtype=f'N{nasubtypes[0]}'
         if nasubtypes[0] in na_seasonal:
             na_seasonal_flag = True
-        if NAtype == 'NB/Vic':
-            NAtype = "InfB: NA-B/Vic"
+        if NAtype == 'B/Vic':
+            NAtype = "N-B/Vic"
         if "pdm09" in NAtype:
             NAtype = NAtype.replace("pdm09","")
+    else:
+        NAtype = 'N-'
 if na.Num_reads[0] <=2:
     NAconfidence = 'Low'
 elif na.Num_reads[0] <=5:
