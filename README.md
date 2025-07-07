@@ -6,7 +6,7 @@ First step, use bin/generate-sample-sheet.py to take an input list of Climb IDs 
 
 ```
 python bin/generate-sample-sheet.py -h
-usage: generate-sample-sheet.py [-h] -i INPUT -o OUTPUT
+usage: generate-sample-sheet.py [-h] -i INPUT -o OUTPUT - p PROJECT
 
 generate-sample-sheet
 
@@ -16,12 +16,14 @@ options:
                         input file containing CLIMB-IDs
   -o OUTPUT, --output OUTPUT
                         Output directory for downloaded data
+  -p PROJECT, --project mSCAPE/synthscape
+                        Project to be queried
 ```
 
 NextFlow Command  
 ```
 
-nextflow run main.nf -profile docker --samplesheet sample-sheet.csv --outdir mapping-test
+nextflow run main.nf -profile docker --samplesheet sample-sheet.csv --metadata fullpath/metadata.csv --outdir mapping-test
 ```
 
 Outputs:
