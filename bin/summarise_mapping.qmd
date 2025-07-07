@@ -70,6 +70,7 @@ nacoverage = 0
 if mapresults.shape[0]>=1:
     mapresults.columns = cols
     mapresults['target_name'] = mapresults['target_name'].str.replace("H1N1pdm09","H1N1|pdm09")
+    mapresults['target_name'] = mapresults['target_name'].str.replace("|B/Vic|","|B/VicNB/Vic|")
     test = mapresults["target_name"].str.split(pat="|", expand=True)
 
     split_read_hit_info(mapresults, test)
