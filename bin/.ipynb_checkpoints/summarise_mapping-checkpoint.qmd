@@ -16,6 +16,7 @@ date: last-modified
 
 climb_id= 'TEST_ID'
 datapath= './flusub.mapped.tab'
+metadata = './metadata.csv'
 ```
 
 Results of mapping to the INSAFLU Reference Set for `{python} climb_id`
@@ -31,9 +32,9 @@ This product is **OFF-SEN** and should not be shared wider than its distribution
 #| tags: [parameters]
 #| 
 from collections import Counter
-import pandas as pd
 import os,sys,glob
 import warnings
+import pandas as pd
 warnings.filterwarnings("ignore")
 cols = ['query_name','query_len','query_start_coord','query_end_coord','strand','target_name','target_length','target_start','target_end','num_base_mapped','num_bases_gaps_mapped','mapping_quality','x1','x2','x3','x4','x5','x6']
 
@@ -51,8 +52,9 @@ segmentdict = {}
 
     
 def split_read_hit_info(mapresults, test):
-    mapresults['target_subtype']=test[2]
+    mapresults['target_subtype'] = test[2]
     mapresults['target_segment'] = test[0]
+    mapresults["target_segment"] = mapresults["target_segment"].fillna("NA")
     mapresults['target_isolate'] = test[1]
 
     test = mapresults["target_subtype"].str.split(pat="N", expand=True)
@@ -60,11 +62,15 @@ def split_read_hit_info(mapresults, test):
     mapresults['hit_Ntype']=test[1]
     mapresults['hit_Htype'] = mapresults['hit_Htype'].str.replace("H","")
     mapresults['hit_Htype'] = mapresults['hit_Htype'].str.replace("A/","")
+   # mapresults['hit_Ntype'] = mapresults['hit_Ntype'].str.replace("pdm09","")
 hacoverage = 0
 nacoverage = 0
+
+
 if mapresults.shape[0]>=1:
     mapresults.columns = cols
-
+    mapresults['target_name'] = mapresults['target_name'].str.replace("H1N1pdm09","H1N1|pdm09")
+    mapresults['target_name'] = mapresults['target_name'].str.replace("|B/Vic|","|B/VicNB/Vic|")
     test = mapresults["target_name"].str.split(pat="|", expand=True)
 
     split_read_hit_info(mapresults, test)
@@ -123,45 +129,70 @@ na = segreadstab[segreadstab['Segment']=='NA']
 mixed_results_HA = False
 mixed_results_NA = False
 
-ha_seasonal = ['1','3',1,3]
+hacall = ''
+nacall = ''
+ha_seasonal = ['1','3',1,3,'B/Vic']
+na_seasonal = ['1','2',1,2,'B/Vic']
 ha_seasonal_flag = False
+na_seasonal_flag = False
 if ha.Num_reads[0] ==0:
     HAtype = 'H-'
+    hacall = 'No reads detected'
 else:
     hanewdf = newdf[newdf['target_segment']=='HA']
     subtypes = list(set(hanewdf['hit_Htype']))
-
+    subtypes = list(filter(lambda x: x is not None, subtypes)) 
     if len(subtypes)>1:
         #choose subtype
         multsubtypes = ";".join(subtypes)
         HAtype=f'H{multsubtypes}'
         mixed_results_HA = True
+        hacall = 'Mixed subtypes detected'
     else:
         HAtype=f'H{subtypes[0]}'
         if subtypes[0] in ha_seasonal:
             ha_seasonal_flag = True
+            hacall = 'Seasonal'
+        elif HAtype == 'HB/Vic':
+            HAtype = "InfB: HA-B/Vic "
+            hacall = 'Seasonal'
+        elif "pdm09" in HAtype:
+            HAtype = HAtype.replace("pdm09","")
+            hacall = 'Seasonal'
+        else:
+            hacall = 'Non-seasonal influenza HA reads detected'
 if ha.Num_reads[0] <=2:
     HAconfidence = 'Low'
 elif ha.Num_reads[0] <=5:
     HAconfidence = 'Medium'
 else:
     HAconfidence = 'High'
-na_seasonal = ['1','2',1,2]
-na_seasonal_flag = False
-NAtype = '-'
 if na.Num_reads[0] ==0:
     NAtype = 'N-'
+    nacall = 'No reads detected'
 else:
     nanewdf = newdf[newdf['target_segment']=='NA']
-    nasubtypes = list(set(nanewdf['hit_Ntype']))
-    if len(nasubtypes)>1:
-       #choose subtype
+    subtypes = list(set(nanewdf['hit_Ntype']))
+    subtypes = list(filter(lambda x: x is not None, subtypes)) 
+    if len(subtypes)>1:
+        #choose subtype
+        multsubtypes = ";".join(subtypes)
+        NAtype=f'N{multsubtypes}'
         mixed_results_NA = True
-        nasubtypes = ";".join(nasubtypes)
+        nacall = 'Mixed subtypes detected'
     else:
-        NAtype=f'N{nasubtypes[0]}'
-        if nasubtypes[0] in na_seasonal:
+        NAtype=f'N{subtypes[0]}'
+        if subtypes[0] in na_seasonal:
             na_seasonal_flag = True
+            nacall = 'Seasonal'
+        elif NAtype == 'NB/Vic':
+            NAtype = "InfB: NA-B/Vic "
+            nacall = 'Seasonal'
+        elif "pdm09" in NAtype:
+            NAtype = NAtype.replace("pdm09","")
+            nacall = 'Seasonal'
+        else:
+            nacall = 'Non-seasonal influenza HA reads detected'
 if na.Num_reads[0] <=2:
     NAconfidence = 'Low'
 elif na.Num_reads[0] <=5:
@@ -173,26 +204,18 @@ seasonal = False
 if ha_seasonal_flag:
     if na_seasonal_flag:
         seasonal=True
-hacall = ''
-nacall = ''
-
-if mixed_results_HA:
-    hacall = 'Mixed subtypes detected'
-elif ha_seasonal_flag:
-    hacall = 'Seasonal'
-elif HAtype == 'H-':
-    hacall = 'No reads detected'
-else:
-    hacall = 'Non-seasonal influenza HA reads detected'
 
 if mixed_results_NA:
     nacall = 'Mixed subtypes detected'
 elif na_seasonal_flag:
-    nacall = 'Seasonal NA reads'
+    nacall = 'Seasonal'
+
 elif NAtype == 'N-':
     nacall = 'No reads detected'
+
 else:
     nacall = 'Non-seasonal influenza NA reads detected'
+
 
 if HAconfidence == 'Low':
     res_conf = 'Low'
@@ -249,7 +272,25 @@ json_object = json.dumps(generate_status_json())
 with open(f"{climb_id}_flusub_result.json", "w") as outfile:
     outfile.write(json_object)
 ```
+## Sample Meta-data
 
+
+```{python}
+#| tags: [metadata]
+#| label: tbl-metadata
+#| tbl-cap: "Sample Meta-data"
+#| layout-ncol: 3
+import pandas as pd
+from IPython.display import Markdown, display
+
+metatab =pd.read_csv(metadata)
+metatab_filt = metatab[metatab['climb_id']==climb_id]
+metatab_filt = metatab_filt.T
+metatab_filt.columns = ['']
+
+display(Markdown(metatab_filt.to_markdown(index = True)))
+
+```
 
 ## Summary Result
 
