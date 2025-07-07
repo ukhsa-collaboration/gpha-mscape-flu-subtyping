@@ -167,7 +167,7 @@ elif ha.Num_reads[0] <=5:
 else:
     HAconfidence = 'High'
 if na.Num_reads[0] ==0:
-    NAtype = 'H-'
+    NAtype = 'N-'
     nacall = 'No reads detected'
 else:
     nanewdf = newdf[newdf['target_segment']=='NA']
