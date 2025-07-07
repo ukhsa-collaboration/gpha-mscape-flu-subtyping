@@ -161,17 +161,19 @@ def main():
     metadata = get_metadata_by_climb_id(climb_id_list)
     md = pd.DataFrame.from_dict(metadata)
     print(md.shape)
+    df_info = []
     for record in climb_id_list:
         print(record)
         try:
-            df_info = []
+            
             df_dict = get_species_proportion(record, ["Alphainfluenzavirus","Betainfluenzavirus"])
     
             df_info.append(df_dict)
         except KeyError:
             print(f"Sample {record} not found in database. Skipping.")
             pass
-    flu_df = pd.DataFrame(df_info)
+        flu_df = pd.DataFrame(df_info)
+
     summary_meta = pd.merge(md,flu_df,left_on="climb_id",right_on="climb_id",how="left")
     summary_meta.to_csv(os.path.join(args.output,f"{filename1}-samplesheet-flu-metadata.csv"),index=False)
     
