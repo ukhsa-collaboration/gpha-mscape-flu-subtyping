@@ -1,0 +1,3 @@
+climb_id,site,sequence_purpose,input_type,sample_source,kraken_report,Total_reads,Kraken_Alphainfluenzavirus_reads,Percentage_Alphainfluenzavirus_reads,Kraken_Betainfluenzavirus_reads,Percentage_Betainfluenzavirus_reads
+C-139ED9F914,gosh,clinical,positive_control,other,s3://mscape-published-taxon-reports/C-139ED9F914/C-139ED9F914_PlusPF.kraken_report.json,157366,3,0.0,2,0.0
+C-DD7CE4D837,gosh,research,positive_control,other,s3://mscape-published-taxon-reports/C-DD7CE4D837/C-DD7CE4D837_PlusPF.kraken_report.json,145438,1,0.0,0,0.0

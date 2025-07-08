@@ -1,0 +1,3 @@
+climb_id,human_filtered_reads_1,human_filtered_reads_2,taxon_reports_dir,kraken_assignments,kraken_report
+C-139ED9F914,s3://mscape-published-read-fractions/C-139ED9F914/C-139ED9F914.human_filtered.fastq.gz,,s3://mscape-published-taxon-reports/C-139ED9F914/,s3://mscape-published-taxon-reports/C-139ED9F914/C-139ED9F914_PlusPF.kraken_assignments.tsv,s3://mscape-published-taxon-reports/C-139ED9F914/C-139ED9F914_PlusPF.kraken_report.json
+C-DD7CE4D837,s3://mscape-published-read-fractions/C-DD7CE4D837/C-DD7CE4D837.human_filtered.fastq.gz,,s3://mscape-published-taxon-reports/C-DD7CE4D837/,s3://mscape-published-taxon-reports/C-DD7CE4D837/C-DD7CE4D837_PlusPF.kraken_assignments.tsv,s3://mscape-published-taxon-reports/C-DD7CE4D837/C-DD7CE4D837_PlusPF.kraken_report.json
