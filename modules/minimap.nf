@@ -11,12 +11,23 @@ process RUN_MINIMAP{
     tuple val(climb_id), path(fastq1)
 
     output:
-    tuple  val(climb_id), path('flusub.mapped.tab'), emit: mappedreads
+    tuple  val(climb_id), path("flusub_complete.txt"), path('*.flusub.mapped.tab'), emit: mappedreads
     
     
     script:
     """
-    minimap2 --secondary=no $PWD/bin/insaflu_refset_2025.fasta ${fastq1} > 'flusub.mapped.tab'
+    set +e
+    minimap2 --secondary=no /shared/team/flu_lod/subtyping/mscape-flusubtyping/bin/insaflu_refset_2025.fasta ${fastq1} > ${climb_id}.flusub.mapped.tab
     rm *gz
+    exit_status=\$?
+    if [ \$exit_status -eq 0 ] ; then
+        echo "True" > flusub_complete.txt
+        exit 0
+    elif grep -q "ERROR:" flusub.mapped.tab ; then
+        echo "False" > flusub_complete.txt
+        exit 0
+    else
+        exit \$exit_status
+    fi
     """
 }
