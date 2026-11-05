@@ -8,7 +8,7 @@ process RUN_MINIMAP{
     publishDir "${params.outdir}/${climb_id}", mode: 'copy'
     
     input:
-    tuple val(climb_id), path(fastq1)
+    tuple val(climb_id), path(fastq1), path(minimap_reference)
 
     output:
     tuple  val(climb_id), path("flusub_complete.txt"), path('*.flusub.mapped.tab'), emit: mappedreads
@@ -17,7 +17,7 @@ process RUN_MINIMAP{
     script:
     """
     set +e
-    minimap2 --secondary=no /shared/team/flu_lod/subtyping/mscape-flusubtyping/bin/insaflu_refset_2025.fasta ${fastq1} > ${climb_id}.flusub.mapped.tab
+    minimap2 --secondary=no ${minimap_reference} ${fastq1} > ${climb_id}.flusub.mapped.tab
     rm *gz
     exit_status=\$?
     if [ \$exit_status -eq 0 ] ; then
