@@ -306,26 +306,37 @@ def create_analysis_fields(
             "This is the flu subtyping pathogen characterisation pipeline"
         ),
     )
+
     analysis.pipeline_name = pipeline_info["name"]
     analysis.pipeline_version = pipeline_info["version"]
     analysis.pipeline_url = pipeline_info["homePage"]
     analysis.outputs = "No s3 outputs"
+    analysis.identifiers = []
 
-    methods_failed = analysis.add_methods(methods_dict={})
+    today = datetime.date.today().isoformat()
+    analysis.analysis_date = today
+    analysis.published_date = today
+
+    # Add methods and versions in the helper's expected format
+    methods_fail = analysis.add_methods({
+        "command": "summarise_flu_mapping.py",
+        "analysis_type": "flu_subtyping",
+    })
 
     _, onyx_versions, query_exitcode = oa.get_data_and_versions_from_onyx(
         sample_id=summary["climb_id"],
         server=server,
         fields=["climb_id"],
     )
-    versions_failed = False
+
+    versions_fail = False
     if query_exitcode == 0:
-        versions_failed = analysis.add_versions_to_methods(
+        versions_fail = analysis.add_versions_to_methods(
             tool_versions={"orange_box_version": orange_box_version},
             onyx_versions=onyx_versions,
         )
 
-    today = datetime.date.today().isoformat()
+    # The helper expects result_metrics as a dict.
     result_fields = {
         "published_date": today,
         "analysis_date": today,
@@ -346,27 +357,28 @@ def create_analysis_fields(
         },
     }
 
-    results_failed = analysis.add_results(
+    results_fail = analysis.add_results(
         top_result=summary["subtype_call"],
         results_dict=result_fields,
     )
+
     analysis.add_server_records(
         sample_id=summary["climb_id"],
         server_name=server,
     )
+
     required_failed, attribute_failed = analysis.check_analysis_object(
         publish_analysis=False
     )
 
-    failed = any(
-        [
-            methods_failed,
-            versions_failed,
-            results_failed,
-            required_failed,
-            attribute_failed,
-        ]
-    )
+    failed = any([
+        methods_fail,
+        versions_fail,
+        results_fail,
+        required_failed,
+        attribute_failed,
+    ])
+
     return analysis, int(failed)
 
 
@@ -411,12 +423,17 @@ def main() -> int:
         pipeline_info=pipeline_info,
         orange_box_version=args.orange_box_version,
     )
+
     if exit_code:
         raise RuntimeError("Onyx analysis fields failed validation")
 
     analysis.write_analysis_to_json(result_file=onyx_json_path)
-    return 0
 
+    # Debug: show the actual fields that were written
+    payload = json.loads(onyx_json_path.read_text())
+    print("Top-level keys:", sorted(payload.keys()))
+    print("result_metrics:", json.loads(payload["result_metrics"]))
+    return 0
 
 if __name__ == "__main__":
     raise SystemExit(main())
