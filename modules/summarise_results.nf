@@ -23,16 +23,16 @@ process RUN_QUARTO {
     export XDG_CACHE_HOME="./.xdg_cache_home"
     export XDG_DATA_HOME="./.xdg_data_home"
 
-    cp /shared/team/flu_lod/subtyping/mscape-flusubtyping/bin/summarise_mapping.qmd .
+    cp /shared/team/flu_lod/subtyping/mscape-flusubtyping/bin/flu_subtyping_report.qmd .
     cp /shared/team/flu_lod/subtyping/mscape-flusubtyping/bin/_quarto.yml .
     cp -r /shared/team/flu_lod/subtyping/mscape-flusubtyping/bin/_extensions .
 
-    quarto render summarise_mapping.qmd \\
+    quarto render flu_subtyping_report.qmd \\
         --output '${climb_id}_summarise_mapping.html' \\
-        -P climb_id:'"${climb_id}"' \\
-        -P summary_json:'"${summary_json}"' \\
-        -P segment_summary_csv:'"${segment_summary_csv}"' \\
-        -P metadata_csv:'"${metadata_csv}"'
+        -P climb_id:'${climb_id}' \\
+        -P summary_json:'${summary_json}' \\
+        -P segment_summary_csv:'${segment_summary_csv}' \\
+        -P metadata_csv:'${metadata_csv}'
     """
 }
 

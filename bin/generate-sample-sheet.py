@@ -1,12 +1,13 @@
 #!/usr/bin/env python
 
-import os
-from onyx import OnyxConfig, OnyxEnv, OnyxClient
 import argparse
-from pathlib import Path
-import pandas as pd
 import csv
 import datetime
+import os
+from pathlib import Path
+
+import pandas as pd
+from onyx import OnyxClient, OnyxConfig, OnyxEnv
 
 config = OnyxConfig(
     domain=os.environ[OnyxEnv.DOMAIN],
@@ -62,14 +63,13 @@ def get_record_by_climb_id(climb_id_list: list):
                 'taxon_reports_dir': taxon_reports_dir,
                 'kraken_assignments': os.path.join(
                     taxon_reports_dir,
-                    str(id)+str('_PlusPF.kraken_assignments.tsv')),
+                    str(id)+'_PlusPF.kraken_assignments.tsv'),
                 'kraken_report': os.path.join(
                 taxon_reports_dir, 
-                str(id)+str('_PlusPF.kraken_report.json'))
+                str(id)+'_PlusPF.kraken_report.json')
             })
         except KeyError:
             print(f"Sample {id} not found in database. Skipping.")
-            pass
     return dict_list
 
 
@@ -104,7 +104,6 @@ def get_species_proportion(record_id, species):
             df_dict.update(species_dict)
     except KeyError:
             print(f"Sample {record_id} not found in database. Skipping.")
-            pass
     return df_dict
 
 def get_metadata_by_climb_id(climb_id_list: list):
@@ -127,11 +126,10 @@ def get_metadata_by_climb_id(climb_id_list: list):
                 'sample_source': data["sample_source"][0],
                 'kraken_report': os.path.join(
                 taxon_reports_dir, 
-                str(id)+str('_PlusPF.kraken_report.json'))
+                str(id)+'_PlusPF.kraken_report.json')
             })
         except KeyError:
             print(f"Sample {id} not found in database. Skipping.")
-            pass
     return dict_list
 
 
@@ -171,7 +169,6 @@ def main():
             df_info.append(df_dict)
         except KeyError:
             print(f"Sample {record} not found in database. Skipping.")
-            pass
         flu_df = pd.DataFrame(df_info)
 
     summary_meta = pd.merge(md,flu_df,left_on="climb_id",right_on="climb_id",how="left")

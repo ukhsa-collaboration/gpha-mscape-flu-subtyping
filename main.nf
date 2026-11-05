@@ -65,6 +65,17 @@ samples = Channel
     }
     .set { ch_fastqs }
 
+    // Add the Minimap reference only to single-end tuples.
+    
+    ch_minimap_reads = ch_fastqs.single_end
+        .map { climb_id, read1 ->
+            tuple(climb_id, [read1], file(params.minimap_reference))
+        }
+        .mix(
+            ch_fastqs.paired_end.map { climb_id, read1, read2 ->
+                tuple(climb_id, [read1, read2], file(params.minimap_reference))
+            }
+        )
 workflow {
     log.info "Samplesheet: ${params.samplesheet}"
     log.info "Metadata table: ${params.metadata}"
@@ -76,6 +87,7 @@ workflow {
     FLUSUB_ANALYSIS(
         params.metadata,
         ch_fastqs.single_end,
+        ch_fastqs.paired_end,
         params.server,
         params.bucket,
         params.context,
