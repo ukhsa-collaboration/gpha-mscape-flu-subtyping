@@ -6,7 +6,7 @@ process S3_UPLOAD {
 
         Inputs:
             - meta: Sample metadata
-            - *_csv: Paths to pneumokity files for upload
+            - *_csv: Paths to files for upload
             - server: Server working on - one of mscape or synthscape
             - bucket: Bucket to upload data to
             - analysis_id: Analysis ID to use in s3 key
@@ -22,8 +22,9 @@ process S3_UPLOAD {
     stageInMode 'copy'
     publishDir "${params.outdir}/${meta}/onyx", mode: params.publish_dir_mode
 
+
     input:
-    tuple val(meta), path(result_csv), path(analysis_id)
+    tuple val(meta), path(mapped_file), path(segment_summary_csv),  path(html), path(analysis_id)
     val server
     val bucket
 
@@ -39,7 +40,7 @@ process S3_UPLOAD {
     -b $bucket \\
     -o . \\
     -a $analysis_id \\
-    -f "${result_csv}" \\
+    -f "${mapped_file},${html},${segment_summary_csv}"  \\
     --prod
     """
     }

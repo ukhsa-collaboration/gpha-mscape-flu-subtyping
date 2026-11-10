@@ -48,6 +48,7 @@ def get_record_by_climb_id(climb_id_list: list):
     dict_list = []
     for id in climb_id_list:
         try:
+            print(id)
             with OnyxClient(config) as client:
                     data = pd.DataFrame(client.filter(
                     project = project,

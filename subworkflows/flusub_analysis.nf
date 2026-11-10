@@ -62,50 +62,53 @@ workflow FLUSUB_ANALYSIS {
 
     // Pass all inputs to RUN_QUARTO as one tuple per sample.
     quarto_input_ch = SUMMARISE_FLU_MAPPING.out.summary.map {
-    climb_id, summary_json, segment_summary_csv ->
+    climb_id, summary_json, segment_summary_csv, onyx_json  ->
     tuple(climb_id, summary_json, segment_summary_csv, metadata)
     }
 
     RUN_QUARTO(quarto_input_ch)
 
     onyx_input_ch = SUMMARISE_FLU_MAPPING.out.summary
-        .map { climb_id, summary_json, segment_summary_csv ->
-            tuple(climb_id, summary_json)
+        .map { climb_id, summary_json, segment_summary_csv, onyx_json ->
+            tuple(climb_id, onyx_json)
         }
 
-    //ONYX_WRITE(onyx_input_ch,server)
+    ONYX_WRITE(onyx_input_ch,server)
 
-    // Join by climb_id so the mapping file and Quarto report stay together.
-    //ch_s3_inputs = flu_sub
-    //    .join(RUN_QUARTO.out.html)
-    //    .join(ONYX_WRITE.out.analysis_id)
-    //    .filter {
-     //       climb_id, minimap_complete, mapped_file, html, analysis_id ->
-      //      minimap_complete.text.contains("True")
-       // }
-     //   .map {
-       //     climb_id, minimap_complete, mapped_file, html, analysis_id ->
-      //      tuple(climb_id, [mapped_file, html], analysis_id)
-       // }
+    ch_s3_inputs = flu_sub
+    .join(
+        SUMMARISE_FLU_MAPPING.out.summary.map {
+            climb_id, summary_json, segment_summary_csv, onyx_json ->
+            tuple(climb_id, segment_summary_csv)
+        }
+    )
+    .join(RUN_QUARTO.out.html)
+    .join(ONYX_WRITE.out.analysis_id)
+    .filter {
+        climb_id, minimap_complete, mapped_file, segment_summary_csv, html, analysis_id ->
+        minimap_complete.text.contains("True")
+    }
+    .map {
+        climb_id, minimap_complete, mapped_file, segment_summary_csv, html, analysis_id ->
+        tuple(climb_id, mapped_file, segment_summary_csv, html, analysis_id)
+    }
 
-    //S3_UPLOAD(ch_s3_inputs, server, bucket)
+    S3_UPLOAD(ch_s3_inputs, server, bucket)
 
-    //ch_update_inputs = ONYX_WRITE.out.analysis_id
-    //    .join(S3_UPLOAD.out.s3_locations)
+    ch_update_inputs = ONYX_WRITE.out.analysis_id
+        .join(S3_UPLOAD.out.s3_locations)
 
-    //ONYX_UPDATE(ch_update_inputs, server)
+    ONYX_UPDATE(ch_update_inputs, server)
 
-    //ch_publish = channel.of()
-    //    .concat(
-    //        ONYX_WRITE.out.analysis_id,
-    //        ONYX_UPDATE.out.analysis_id.ifEmpty([[], []])
-     //   )
-     //   .collect()
-     //   .map { meta_write, id_write, meta_update, id_update ->
-      //      tuple(meta_write, id_write)
-     //   }
+    ch_publish = ONYX_WRITE.out.analysis_id
+    .mix(ONYX_UPDATE.out.analysis_id)
+    .groupTuple()
+    .map { climb_id, ids ->
+        def final_id = ids.flatten().find { it && it.toString() != '[]' }
+        tuple(climb_id, final_id)
+    }
 
-    //ONYX_PUBLISH(server, ch_publish)
+    ONYX_PUBLISH(server, ch_publish)
 
     emit:
     flusub_json = quarto_input_ch.map {

@@ -83,10 +83,11 @@ def prepare_mapping_hits(mapping: pd.DataFrame) -> pd.DataFrame:
         return mapping
 
     # Expected target_name structure, matching the original report:
-    # segment|isolate|subtype
+    # segment|isolate|A|subtype
     target_fields = mapping["target_name"].astype(str).str.split(
-        "|", n=2, expand=True, regex=False
+        "|", n=3, expand=True, regex=False
     )
+   # print(target_fields)
     if target_fields.shape[1] < 3:
         raise ValueError(
             "Expected target_name values formatted as "
@@ -181,11 +182,12 @@ def segment_type_call(
 
     field = "hit_Htype" if segment == "HA" else "hit_Ntype"
     subtypes = sorted(
-        value
+        value.replace("pdm09", "")
         for value in rows[field].dropna().astype(str).unique()
         if value and value.lower() != "nan"
     )
-
+    subtypes = list(set(subtypes))
+   # print(subtypes)
     if not subtypes:
         return f"{prefix}-", "No subtype detected", False
 
@@ -193,6 +195,7 @@ def segment_type_call(
         return f"{prefix}{';'.join(subtypes)}", "Mixed subtypes detected", False
 
     subtype = subtypes[0]
+   # print(subtype)
     seasonal_subtypes = {"1", "3", "B/Vic"} if segment == "HA" else {
         "1",
         "2",
@@ -205,6 +208,7 @@ def segment_type_call(
     )
 
     display_subtype = subtype.replace("pdm09", "").replace("|", "")
+   # print(display_subtype)
     call = f"{prefix}{display_subtype}"
 
     if subtype == "B/Vic":
@@ -315,7 +319,7 @@ def create_analysis_fields(
 
     today = datetime.date.today().isoformat()
     analysis.analysis_date = today
-    analysis.published_date = today
+  #  analysis.published_date = today
 
     # Add methods and versions in the helper's expected format
     methods_fail = analysis.add_methods({
@@ -338,10 +342,9 @@ def create_analysis_fields(
 
     # The helper expects result_metrics as a dict.
     result_fields = {
-        "published_date": today,
         "analysis_date": today,
         "name": "flu_subtyping",
-        "details": "Flu subtyping – minimap2 and clade typing",
+        "details": "Flu subtyping – minimap2/bwa-mem",
         "exit_code": 0,
         "pipeline_status": "success",
         "result": {

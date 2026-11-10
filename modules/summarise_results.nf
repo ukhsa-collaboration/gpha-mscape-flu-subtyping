@@ -15,17 +15,16 @@ process RUN_QUARTO {
 
     output:
 
-          path("${climb_id}_summarise_mapping.html"),
-          emit: html
+          tuple val(climb_id), path("${climb_id}_summarise_mapping.html"), emit: html
 
     script:
     """
     export XDG_CACHE_HOME="./.xdg_cache_home"
     export XDG_DATA_HOME="./.xdg_data_home"
 
-    cp /shared/team/flu_lod/subtyping/mscape-flusubtyping/bin/flu_subtyping_report.qmd .
-    cp /shared/team/flu_lod/subtyping/mscape-flusubtyping/bin/_quarto.yml .
-    cp -r /shared/team/flu_lod/subtyping/mscape-flusubtyping/bin/_extensions .
+    cp /shared/team/gpha-mscape-flu-subtyping/bin/flu_subtyping_report.qmd .
+    cp /shared/team/gpha-mscape-flu-subtyping/bin/_quarto.yml .
+    cp -r /shared/team/gpha-mscape-flu-subtyping/bin/_extensions .
 
     quarto render flu_subtyping_report.qmd \\
         --output '${climb_id}_summarise_mapping.html' \\
@@ -54,6 +53,7 @@ process SUMMARISE_FLU_MAPPING {
     tuple val(climb_id),
           path("${climb_id}_flu_subtyping_summary.json"),
           path("${climb_id}_segment_mapping_summary.csv"),
+          path("${climb_id}.flu_subtyping.analysis_fields.json"),
           emit: summary
 
     script:
