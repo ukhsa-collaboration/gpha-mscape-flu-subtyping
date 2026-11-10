@@ -294,7 +294,15 @@ def make_pipeline_dict(pipeline_info: str) -> dict:
         "version": parts[1].strip(),
         "homePage": parts[2].strip(),
     }
-
+    
+def make_pipeline_command() -> str:
+    """Describe the main analysis steps recorded for this pipeline run."""
+    return (
+        "minimap2 <...> <id>.flusub.mapped.tab\n"
+        "summarise_flu_mapping.py ... \n"
+        "quarto render flu_subtyping_report.qmd "
+        "--output <id>_summarise_mapping.html"
+    )
 
 def create_analysis_fields(
     summary: dict,
@@ -314,6 +322,7 @@ def create_analysis_fields(
     analysis.pipeline_name = pipeline_info["name"]
     analysis.pipeline_version = pipeline_info["version"]
     analysis.pipeline_url = pipeline_info["homePage"]
+    analysis.pipeline_command = make_pipeline_command()
     analysis.outputs = "No s3 outputs"
     analysis.identifiers = []
 
@@ -435,6 +444,7 @@ def main() -> int:
     # Debug: show the actual fields that were written
     payload = json.loads(onyx_json_path.read_text())
     print("Top-level keys:", sorted(payload.keys()))
+    assert isinstance(payload.get("pipeline_command"), str)
     print("result_metrics:", json.loads(payload["result_metrics"]))
     return 0
 
