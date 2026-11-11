@@ -353,7 +353,7 @@ def create_analysis_fields(
     result_fields = {
         "analysis_date": today,
         "name": "flu_subtyping",
-        "details": "Flu subtyping – minimap2/bwa-mem",
+        "details": "Flu subtyping – minimap2",
         "exit_code": 0,
         "pipeline_status": "success",
         "result": {

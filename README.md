@@ -11,7 +11,7 @@ For each sample, the workflow:
 3. Renders a per-sample HTML report with Quarto.
 4. Uses the Onyx helper processes to write/update analysis records, upload the mapped table, segment summary and HTML report to S3, and publish the analysis.
 
-The generated analysis-fields JSON includes pipeline metadata and a `pipeline_command` string describing the main steps. That command is a concise template with placeholders (for example, `<...>` and `<id>`), not a literal record of every resolved runtime argument.
+The generated analysis-fields JSON includes pipeline metadata and a `pipeline_command` string describing the main steps. This field has a limit of 200 characters so is not a literal record of every command.
 
 The current workflow uses Minimap2 for both read layouts. BWA-MEM is not currently used; adopting it would require converting its SAM output to the format expected by the flu-mapping summarizer or adding SAM support there.
 
@@ -67,7 +67,7 @@ Adjust the server and bucket for the intended environment. Parameters including 
 Outputs are organized by CLIMB ID under the output directory. They include:
 
 - Minimap2 mapping table (`*.flusub.mapped.tab`) and mapping-completion status.
-- Flu-subtyping summary JSON (`*_flu_subtyping_summary.json`).
+- Flu-subtyping summary JSON (`*_flu_subtyping_summary.json`). # Used by the quarto report only
 - Segment-mapping summary CSV (`*_segment_mapping_summary.csv`).
 - Onyx analysis-fields JSON (`*.flu_subtyping.analysis_fields.json`), including the `pipeline_command` field.
 - Quarto HTML report (`*_summarise_mapping.html`).
