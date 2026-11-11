@@ -1,3 +1,4 @@
+
 # mSCAPE Flu Subtyping Nextflow Pipeline
 
 A Nextflow DSL2 pipeline for flu subtyping of human-filtered sequencing reads. It maps single-end and paired-end reads against an influenza reference with Minimap2, summarizes the mapping results, renders a per-sample Quarto report, and prepares analysis data for Onyx and S3.
@@ -25,11 +26,8 @@ The current workflow uses Minimap2 for both read layouts. BWA-MEM is not current
 
 The current configuration references shared UKHSA paths for the Minimap2 reference and Quarto assets. Make these paths available to the execution environment, or update the configuration/process paths for another environment. Use the appropriate authorized server and bucket; do not test against production resources unless authorized.
 
-
 ## Installation
 
-Add installation instructions here. Ideally include commands to make
-the process as easy as possible for users.
 
 Clone repo and create environment:
 
@@ -39,29 +37,6 @@ Clone repo and create environment:
 
 `conda activate flusub`
 
-
-## Inputs
-
-The sample-sheet CSV must contain:
-
-- `climb_id`
-- `human_filtered_reads_1`
-- `human_filtered_reads_2` for paired-end samples; omit or leave it empty for single-end samples.
-
-A metadata CSV is also provided to the report process. It should include the fields expected by `bin/flu_subtyping_report.qmd`.
-
-### Generate sample-sheet and metadata files
-
-`bin/generate-sample-sheet.py` can query Onyx for the read locations and metadata from a text file containing one CLIMB ID per line. For example:
-
-```bash
-python bin/generate-sample-sheet.py \
-  --input climb_ids.txt \
-  --output input_files \
-  --project mscape
-```
-
-The script writes timestamped sample-sheet and flu-metadata CSV files under the output directory. Review the generated files and ensure their paths are visible to Nextflow and its executor.
 
 ## Run the pipeline
 
@@ -97,5 +72,4 @@ Only samples whose mapping completion status is successful are intended for the 
 - `RUN_QUARTO` expects the report QMD, Quarto configuration, and extensions at the shared paths specified in `modules/summarise_results.nf`.
 - The mapping summarizer consumes the Minimap2 mapping-table format; a mapper change may require an output-conversion step or summarizer changes.
 - Onyx write, update, and publish operations require valid credentials and appropriate permissions.
-
 

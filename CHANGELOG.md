@@ -1,4 +1,3 @@
-
 # Changelog
 
 Notable changes to the mSCAPE flu-subtyping pipeline are recorded here.
@@ -19,9 +18,3 @@ Notable changes to the mSCAPE flu-subtyping pipeline are recorded here.
 - The summarizer expects Minimap2 mapping-table input; using BWA-MEM will require a conversion step or SAM-format support in the summarizer.
 
 
-### mSCAPE original Template - Version 0.2.0
-Now has added features:
-- updated the pre-commit config to implement search for climb IDs on commit.
-- added branch protection json
-- dynamic versioning through version set in __init__.py in package directory and set in pyproject.toml
-- removed fixed versions of ruff so the version should match the GitHub actions.
