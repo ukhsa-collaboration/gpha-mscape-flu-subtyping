@@ -2,8 +2,6 @@ import json
 import sys
 from pathlib import Path
 
-import pytest
-
 # easiest for this repo if bin is treated as importable
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "bin"))
 

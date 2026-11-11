@@ -214,10 +214,7 @@ def segment_type_call(
     if subtype == "B/Vic":
         call = f"InfB: {segment}-B/Vic"
 
-    if is_seasonal:
-        category = "Seasonal"
-    else:
-        category = f"Non-seasonal influenza {segment} reads detected"
+    category = "Seasonal" if is_seasonal else f"Non-seasonal influenza {segment} reads detected"
 
     return call, category, is_seasonal
 

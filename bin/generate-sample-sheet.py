@@ -38,7 +38,7 @@ def parse_file(fp: Path):
     Read in text file, seperate climb ids into lis
     :args: filepath str()
     """
-    with open(fp, "r", encoding="utf-8-sig") as file:
+    with open(fp, encoding="utf-8-sig") as file:
         data = file.readlines()  # Reads lines into a list
         data = [line.strip() for line in data]  # Remove newline characters
         data = [s.replace('"', '') for s in data] # remove " from strings
@@ -117,8 +117,8 @@ def get_metadata_by_climb_id(climb_id_list: list):
                     climb_id = id
                 ))
         
-            site = data["site"][0]
-            read_2_link = data["human_filtered_reads_2"][0]
+            data["site"][0]
+            data["human_filtered_reads_2"][0]
             taxon_reports_dir = data["taxon_reports"][0]
             dict_list.append({'climb_id': id, 
                 'site': data["site"][0], 
