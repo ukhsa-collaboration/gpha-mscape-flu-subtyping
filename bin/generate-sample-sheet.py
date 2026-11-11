@@ -86,11 +86,15 @@ def get_species_proportion(record_id, species):
         try:    
             unclass = class_calls.loc[class_calls['human_readable'] == 'unclassified', 'count_descendants'].item()
         except:
+            print("No unclassified reads found in kraken report")
             unclass = 0
+            raise
         try:
             root = class_calls.loc[class_calls['human_readable'] == 'root', 'count_descendants'].item()
         except:
             root = 0
+            print("No root reads found in kraken report")
+            raise
         total_reads = unclass + root
         df_dict = {}
         for s in species:
@@ -102,6 +106,7 @@ def get_species_proportion(record_id, species):
             except:
                 species_dict = {'climb_id': record_id,'Total_reads': total_reads, f'Kraken_{s}_reads': 0, 
                    f'Percentage_{s}_reads': 0}
+                raise
             df_dict.update(species_dict)
     except KeyError:
             print(f"Sample {record_id} not found in database. Skipping.")
