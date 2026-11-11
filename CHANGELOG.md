@@ -1,4 +1,4 @@
-<<<<<<< HEAD
+
 # Changelog
 
 Notable changes to the mSCAPE flu-subtyping pipeline are recorded here.
@@ -17,11 +17,11 @@ Notable changes to the mSCAPE flu-subtyping pipeline are recorded here.
 
 - Minimap2 is used for both single-end and paired-end samples. BWA-MEM is not currently part of the workflow.
 - The summarizer expects Minimap2 mapping-table input; using BWA-MEM will require a conversion step or SAM-format support in the summarizer.
-=======
-mSCAPE Template - Version 0.2.0
+
+
+### mSCAPE original Template - Version 0.2.0
 Now has added features:
 - updated the pre-commit config to implement search for climb IDs on commit.
 - added branch protection json
 - dynamic versioning through version set in __init__.py in package directory and set in pyproject.toml
 - removed fixed versions of ruff so the version should match the GitHub actions.
->>>>>>> e5678ceaaf8341addfb3d98fdc0dab0f49fc5217
